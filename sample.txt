@@ -1,0 +1,13 @@
+palindrome evedamnededenmadeve
+factorial 5
+reverseString HelloWorld!
+stringLength BeforeSoftwareCanBeReusableItFirstHasToBeUsable
+armstrong 345
+power 45634 4
+compareString hey buddy
+findMaximum 5.34 29.69 -23.99 -18.88 -23.7 -33.11 52.24 5.34 29.69 -23.99 -18.88 -23.7 -33.11 52.24
+linearSearch 82.29 52.22 17.33 -0.45 18.62 37.71 69.48 82.29
+bubbleSort 5.02 54.5 8.94 -66.89 -10.1 -83.81 -45.1 42.87
+mergeSort 9.47 85.38 39.51 16.45 -25.87 21.79 4.92 17.79 16.92
+comp 
+matrixMult 2 28.7 -13.81 36.81 7.26
