@@ -3,7 +3,7 @@
 #include <string.h>
 
 
-void isPalindrome(void) { printf("Function Palindrome Called.\n"); }
+void palindrome(void) { printf("Function Palindrome Called.\n"); }
 void matrixmul(void) { printf("Function  Matrix Mul Called\n"); }
 void function_c(void) { printf("Funtion Called. No such That Function...\n"); }
 void merge_sort(void) { printf("Function Merge Sort Called.\n"); }
@@ -13,7 +13,7 @@ const static struct {
   const char *name;
   void (*func)(void);
 } mapping [] = {
-  { "palindrome", isPalindrome },
+  { "palindrome", palindrome },
   { "matrixMult", matrixmul },
   { "comp", function_c },
   { "mergeSort", merge_sort },
@@ -70,4 +70,29 @@ int main(int argc, char **argv) {
 	{
 		perror(argv[1]);
 	}
+}
+
+
+
+char palindrome(char a[],int count) {
+	printf("--Palindrome Function Called..\n"); 
+	// printf("%s",a);
+	size_t i,j;
+	char *output;
+	// char str[6] = "abdbaa";
+	for(i = 0, j = strlen(a)-1; i < j; i++, j--){
+		// printf("%c\n",a[i]);
+		if(a[j] != a[i]){
+			// sprintf(output,"%s %s",);
+			// printf("String is NOT palindrome \n"); 
+			// x = "String is not Palinderome";
+			output = "String is not palindrome";
+			// output = "asd";
+			return output;
+		}
+	} 
+	output = "String is Palindrome"
+	// printf("String is Palindrome.\n");
+	return output;
+
 }
