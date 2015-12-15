@@ -114,3 +114,18 @@ char *palindrome(char a[],int count) {
 	return;
 
 }
+
+
+char *factorial (char a[],int count){
+	printf("Factorial Function Called \n");
+	int fact=1,no;
+	char *token=NULL;
+	token = strtok(a," ");
+	// printf("%d\n",atoi(token));
+	no = atoi(token);
+	while(no>1){
+		fact=fact*no;
+		no--;
+	}
+	printf("Factorial : %d\n",fact);
+}
