@@ -1,38 +1,43 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
 
+char *palindrome (char a[],int count);
+char *factorial (char a[],int count);
+char *reverseString (char a[],int count);
+char *stringLength (char a[],int count);
+char *armstrong (char a[],int count);
+char *power (char a[],int count);
+char *compareString (char a[],int count);
+char *findMaximum (char a[],int count);
+char *linearSearch (char a[],int count);
+char *bubbleSort (char a[],int count);
+char *mergeSort (char a[],int count);
+void partition(float arr[],int low,int high);
+void mergeSt(float arr[],int low,int mid,int high);
+char *matrixMult (char a[],int count);
+char *computation (char a[],int count);
 
-void palindrome(void) { printf("Function Palindrome Called.\n"); }
-void matrixmul(void) { printf("Function  Matrix Mul Called\n"); }
-void function_c(void) { printf("Funtion Called. No such That Function...\n"); }
-void merge_sort(void) { printf("Function Merge Sort Called.\n"); }
-void reverse_string(void) { printf("Function Reverse String Called\n"); }
-
-const static struct {
-  const char *name;
-  void (*func)(void);
-} mapping [] = {
-  { "palindrome", palindrome },
-  { "matrixMult", matrixmul },
-  { "comp", function_c },
-  { "mergeSort", merge_sort },
-  { "reverseString", reverse_string },
+struct {
+	const char *functionName;
+	char *(*functionPointer)(char* ,int);
+} functionList [] = {
+	{ "palindrome", palindrome },
+	{ "matrixMult", matrixMult },
+	{ "factorial", factorial },
+	{ "reverseString", reverseString },
+	{ "stringLength", stringLength },
+	{ "armstrong", armstrong },
+	{ "power", power },
+	{ "compareString", compareString },
+	{ "findMaximum", findMaximum },
+	{ "linearSearch", linearSearch },
+	{ "bubbleSort", bubbleSort },
+	{ "mergeSort", mergeSort },
+	{ "computation", computation },
+	
 };
 
-int call_function(const char *name)
-{
-  int i;
-
-  for (i = 0; i < (sizeof(mapping) / sizeof(mapping[0])); i++) {
-    if (!strcmp(mapping[i].name, name) && mapping[i].func) {
-      mapping[i].func();
-      return 0;
-    }
-  }
-
-  return -1;
-}
 
 /* Function to get array from the file */
 int main(int argc, char **argv) {
@@ -42,27 +47,35 @@ int main(int argc, char **argv) {
 		return -1;
 	}
 	// const char filename[] = "sample.txt"
-	const char s[2] = " ";
-	char buffer[BUFSIZ], *ptr;
-	char *token;
+	char buffer1[20],buffer2[1000000], *ptr;
+	char *token,*buffer;
+	char *out;
+	size_t len=0;
+	int i;
 	FILE *file = fopen(argv[1], "r");
 	if ( file ){
-		while(fgets(buffer, sizeof buffer,file) != NULL)
+		while(getline(&buffer,&len,file) != -1) //while(fgets(buffer, sizeof buffer,file) != NULL)
 		{
-			printf("line in buffer........\n");
-			// printf("%s\n",buffer);
-	
-			token = strtok(buffer," ");
-			// printf("----%s_%s\n",token);
-			call_function(token);
-			// printf("Input i/p\n",token);
-			token = strtok(NULL," ");
-			while (token != NULL)
+			int count=0;
+			sscanf(buffer, "%s %[^\n]", buffer1,buffer2);
+			// printf("%d--%d\n",strlen(buffer1),strlen(buffer2));
+			buffer = strtok(buffer," ");
+			ptr = buffer2;
+			// printf("%s\n",*ptr);
+			// printf("%s__%s\n",buffer1,buffer2);
+			while (buffer != NULL)
 			{
-				printf ("%s\n",token);
-				token = strtok(NULL," ");
+				// printf ("--%s \n",buffer);
+				buffer = strtok(NULL," ");
+				count++;
 			}
-			printf("--END OF LINE READ.--\n\n\n");
+			
+			
+			for (i = 0; i < (sizeof(functionList) / sizeof(functionList[0])); i++) {
+				if (!strcmp(functionList[i].functionName, buffer1)) {
+					functionList[i].functionPointer(ptr,count);
+				}
+			}
 		}
 		fclose(file);
 	}
@@ -73,26 +86,31 @@ int main(int argc, char **argv) {
 }
 
 
-
-char palindrome(char a[],int count) {
-	printf("--Palindrome Function Called..\n"); 
-	// printf("%s",a);
+char *palindrome(char a[],int count) {
+	printf("Palindrome Function Called..\n"); 
+	// sprintf(a,"%s",a);
+	// char *x ;
+	// x=a;
+	// printf("%s",strtok(a," "));
+	// const char *x;
+	// x=a;
+	printf("%s",a);
 	size_t i,j;
-	char *output;
+	// char *output;
 	// char str[6] = "abdbaa";
-	for(i = 0, j = strlen(a)-1; i < j; i++, j--){
+	for(i = 0, j = strlen(a); i < j; i++, j--){
 		// printf("%c\n",a[i]);
 		if(a[j] != a[i]){
 			// sprintf(output,"%s %s",);
-			// printf("String is NOT palindrome \n"); 
+			printf("String is NOT palindrome \n"); 
 			// x = "String is not Palinderome";
-			output = "String is not palindrome";
+			// output = "String is not pl";
 			// output = "asd";
-			return output;
+			return ;
 		}
 	} 
-	output = "String is Palindrome"
-	// printf("String is Palindrome.\n");
-	return output;
+
+	printf("String is Palindrome.\n");
+	return;
 
 }
