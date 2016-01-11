@@ -1,4 +1,3 @@
-# Distributed_P
 ##Distributed System
 
 This project is a distributed execution system. This system can run a pre-defined set of functions or algorithms. The system is given tasks to run via a flat file.
