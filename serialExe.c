@@ -1,6 +1,4 @@
 #include"header.h"
-#include<mpi.h>
-
 /* Function Mapping by struct using function name and pointers to functions. (FUNCTION POINTER concept). */
 struct {
 	const char *functionName;
@@ -24,165 +22,53 @@ struct {
 	
 };
 
-
-// Main mehtod
-int main(int argc , char **argv)
-{
+// Main Method.
+int main(int argc, char **argv) {
 	// If input txt file not given at run time.
 	if(argc < 2)
 	{
-		printf("Give the filename. Usage: mpirun BinaryFile InputFile.txt\n");
+		printf("Give the filename. Usage: ./a.out filename\n");
 		return -1;
 	}
-	int numProcess,rank,i,j,k;
+	char functionName[20],functionInput[1000000], *ptr;
+	char *token,*buffer;
+	char *out;
 	size_t len=0;
-	int tag = 1,teminateFlag=-101;
-	int prcRank=1;
-	int stringSize;
-	char buffer1[1000000],buffer2[1000000],*ptr;
-	char *buffer,*ptr1;
-	char *recEle;
-	FILE *file = fopen(argv[1], "r"); // Open input file.
-	FILE *file2 = fopen(argv[1], "r");
-	
-	MPI_Status status;
-	MPI_Init(&argc, &argv);
-	MPI_Comm_size(MPI_COMM_WORLD, &numProcess);
-	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	
-	// MPI_Request req[4];
-	int count=1,lineCount=0;
-	int l=0;
-	int returnToTask,recvNo;
-	
-	// Create output files to save result.
-	char outputString[12];
-	strcat(outputString,"rank");
-	sprintf(outputString,"%s_%d.txt",outputString,rank);
-	FILE *file1 = fopen(outputString, "w");
-	
-	// Minimum number of processor.
-	if(numProcess <= 1){
-		printf("Error! Please provide more than 1 processor. ");
-		MPI_Abort(MPI_COMM_WORLD,0);
-	}
-	
-	/* MASTER node will do this. */
-	if(rank == MASTER){		
-		if ( file ){
-			// Count the number of line in file.
-			while(getline(&buffer,&len,file2) != -1){
-				lineCount++;
-			}	
-			fclose(file2);
-			/* Initial Send to all the slave node.*/
-			for (i = 0; fgets(buffer1, sizeof buffer1, file),i<numProcess-1;i++)
+	int i;
+	FILE *file = fopen(argv[1], "r");
+	FILE *output = fopen("outputSerial.txt", "w");
+	start();
+	if ( file ){
+		while(getline(&buffer,&len,file) != -1)
+		{
+			int tokenCount=0;
+			// Split string in functionName & input.
+			sscanf(buffer,"%s %[^\n]", functionName,functionInput);
+			buffer = strtok(buffer," ");
+			while (buffer != NULL)
 			{
-				int stringSize = strlen(buffer1)+1;
-				MPI_Send(&stringSize,1,MPI_INT,i+1,i+1,MPI_COMM_WORLD);
-				MPI_Send(&buffer1,stringSize,MPI_CHAR,i+1,i+1,MPI_COMM_WORLD);
-				/* 			MPI_ISend(&stringSize,1, MPI_INT,prcRank,tag, MPI_COMM_WORLD,req[i]);
-				MPI_ISend(buffer,stringSize,MPI_CHAR,prcRank,tag, MPI_COMM_WORLD,req[i]); */
+				buffer = strtok(NULL," ");
+				tokenCount++;
 			}
-
-			int pRank = numProcess;
-			for( i = 0; fgets(buffer1, sizeof buffer1, file),i<(lineCount-numProcess+1);i++){
-				MPI_Recv(&recvNo,1,MPI_INT,MPI_ANY_SOURCE,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
-				returnToTask=status.MPI_SOURCE;
-				stringSize = strlen(buffer1)+1;
-				MPI_Send(&stringSize,1,MPI_INT,returnToTask,pRank,MPI_COMM_WORLD);
-				MPI_Send(&buffer1,stringSize,MPI_CHAR,returnToTask,pRank,MPI_COMM_WORLD);
-				pRank++;
-			}
-			// MPI_Barrier(MPI_COMM_WORLD);
-			
-			/* Last Recieve from slaves and send termination flag to slaves.*/
-			for(i=0;i<numProcess-1;i++){
-				MPI_Recv(&recvNo,1,MPI_INT,MPI_ANY_SOURCE,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
-				tag=status.MPI_TAG;
-				returnToTask=status.MPI_SOURCE;
-				MPI_Send(&teminateFlag,1,MPI_INT,returnToTask,tag,MPI_COMM_WORLD);
-			}
-			fclose(file);
-		}
-	}
-
-	// MPI_Barrier(MPI_COMM_WORLD);
-	
-	/* Final write to output file */	
-	if(rank == MASTER){
-		// while(lineCount!=0){
-			// printf("Insidde");
-			// MPI_Recv(&stringSize,1, MPI_INT, MPI_ANY_SOURCE,MPI_ANY_TAG,MPI_COMM_WORLD,&status); //Recieve string size.
-			// printf("Size %d",stringSize);
-			// char *string = (char *)malloc(stringSize*sizeof(char));
-			// MPI_Recv(string,stringSize,MPI_CHAR,MPI_ANY_SOURCE,MPI_ANY_TAG,MPI_COMM_WORLD,&status); // Recieve whole string.	
-			// fprintf(file1,"%s\n",string);
-			// lineCount--;
-		// } 
-		// fclose(file1);
-		printf("Please check the output file.\n");
-	}
-	
-	
-	/* All slave will do this */
-	if(rank!=0){
-		/* All slave will receive data from the master untill all line read by master.  */
-		for(;;){
-			int temp = 5;
-			int i=0;
-			size_t len=0;
-			char *buffer,*token1,*token2,*coun,*str,functionName[20],functionInput[1000000];
-			int string_Size;	
-			int numberOfInput=0,taskCompletion=-1;
-			MPI_Recv(&string_Size,1, MPI_INT, 0,MPI_ANY_TAG,MPI_COMM_WORLD,&status); //Recieve string size.
-
-			/* When MASTER node send FLAG = -101 for termination of process. */
-			if (string_Size == -101){
-				// printf("Final call from MASTER.\n");
-				// while(fgets(functionName, sizeof functionName, file1)){
-					// string_Size = strlen(functionName);
-					// MPI_Send(&string_Size,1,MPI_INT,0,0,MPI_COMM_WORLD);
-					// MPI_Send(&functionName,string_Size,MPI_CHAR,0,0,MPI_COMM_WORLD);
-				// }	
-				fclose(file1);
-				break;
-			}
-			char *string = (char *)malloc(string_Size*sizeof(char));
-			MPI_Recv(string,string_Size,MPI_CHAR, 0,MPI_ANY_TAG,MPI_COMM_WORLD,&status); // Recieve whole string.
-			sscanf(string,"%s %[^\n]",functionName,functionInput); // Split string in functionName & input.
-			
-			// Counting #ofTokens in line.
-			token1 = strtok(string," ");
-			while (token1 != NULL)
-			{
-				token1 = strtok(NULL," ");
-				numberOfInput++;
-			}
-			// sleep(10/rank);
 			
 			/* Calling the function by comaparing the funcationName to struct functionName */
 			for (i = 0; i < (sizeof(functionList) / sizeof(functionList[0])); i++) {
-				if (strcmp(functionList[i].functionName, functionName) == 0) {
-					char *writeToFile = functionList[i].functionPointer(functionInput,numberOfInput-1);
-					fprintf(file1,"%d,%s\n",status.MPI_TAG,writeToFile);// Write to their own ouput file.
+				if (!strcmp(functionList[i].functionName, functionName)) {
+					out = functionList[i].functionPointer(functionInput,tokenCount);
+					fprintf(output, "%s\n",out); // Write to output file.
 				}
 			}
-
-			MPI_Send(&taskCompletion,1,MPI_INT,0,0,MPI_COMM_WORLD);
-			// printf("JOB COMPLETED...SLAVE(%d) Send NO:%d...\n",rank,taskCompletion)
-			/* if(rank==1){
-				sleep(2);
-			}else if(rank == 2){
-				sleep(4);
-			*/
 		}
+		fclose(file);
+		fclose(output);
+		stop();
 	}
-
-	MPI_Finalize();
-	return 0;
+	else 
+	{
+		perror(argv[1]);
+	}
+	printf("Please check ouputSerial.txt file.\n");
 }
-
 
 
 
@@ -480,6 +366,7 @@ char *functionComputation (){
 	return outputString;
 
 }
+
 
 
 char *functionMatrixMult(char *a,int count) { 
