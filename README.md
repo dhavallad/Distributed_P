@@ -1,5 +1,7 @@
+
 ##Distributed System
 
+###Introduction
 This project is a distributed execution system. This system can run a pre-defined set of functions or algorithms. The system is given tasks to run via a flat file.
 The goal of this system as described above is to execute several tasks in a distributed environment so that several tasks can be run in parallel and the overall job can finish faster than a serial execution.
 
